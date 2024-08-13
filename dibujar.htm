@@ -32,6 +32,10 @@
         </select>
         <button id="clear">Limpiar Canvas</button>
     </div>
+	<div id="controls">
+		<p>¿Que quieres hacer con las figuras?</p>
+		<input type="number" id="">
+    </div>
     <canvas id="canvas" width="800" height="600"></canvas>
     <script>
 		// Obtener referencias a los elementos
@@ -64,7 +68,6 @@
 			shapes.push(shape);
 			drawShapes();
 		});
-
 		// Función para dibujar todas las formas en el canvas
 		function drawShapes() {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -82,14 +85,28 @@
 				ctx.stroke();
 			});
 		}
-
 		// Manejar el botón de limpiar
 		clearButton.addEventListener('click', () => {
 			shapes = [];
 			drawShapes();
 		});
-		function translacion() {
+		//Funciones puras:
+
+		//Translacion
+		function translacion(ubicacion, desplazamiento) {
+			var actual=[];
+			for (let index = 0; index < ubicacion.length; index++) {
+				actual[index]=ubicacion[index]+desplazamiento[index];
+			}
+			return actual
+		}
+		//Rotacion
+		function rotacion(posicion, angulo) {
 			
+			const r = Math.sqrt(posicion[0] * posicion[0] + posicion[1] * posicion[1]);
+    		const theta = Math.atan2(posicion[1], posicion[0]) * (180 / Math.PI);
+
+			return[r,theta+angulo]
 		}
     </script>
 </body>
