@@ -108,6 +108,17 @@
 
 			return[r,theta+angulo]
 		}
+		//Escala
+		function escalarRectangulo(propiedades,porcentaje) {
+			var actual=[];
+			for (let index = 0; index < propiedades.length; index++) {
+				actual[index]=propiedades[index]*(porcentaje/100);
+			}
+			return actual
+		}
+		function escalarCirculo(radio,porcentaje) {
+			return radio*(porcentaje/100)	
+		}
     </script>
 </body>
 </html>
