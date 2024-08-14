@@ -55,106 +55,114 @@
 	</div>
     <canvas id="canvas" width="800" height="600"></canvas>
 	<script>
-		// Obtener referencias a los elementos
-		const canvas = document.getElementById('canvas');
-		const ctx = canvas.getContext('2d');
-		const shapeSelect = document.getElementById('shape');
-		const clearButton = document.getElementById('clear');
-	
-		// Propiedades de las figuras
-		let translacionXInput = document.getElementById("translacionX");
-		let translacionYInput = document.getElementById("translacionY");
-	
-		let translacion = [parseFloat(translacionXInput.value), parseFloat(translacionYInput.value)];
-	
-		let currentShape = 'rectangle';
-		let shapes = [];
-		let selectedShapeIndex = null;
-	
-		// Manejar la selección de formas
-		shapeSelect.addEventListener('change', (e) => {
-			currentShape = e.target.value;
-		});
-	
-		// Manejar el clic en el canvas para dibujar formas
-		canvas.addEventListener('click', (e) => {
-			const rect = canvas.getBoundingClientRect();
-			const x = e.clientX - rect.left;
-			const y = e.clientY - rect.top;
-	
-			// Actualizar la translación cada vez que se hace clic
-			translacion = [parseFloat(translacionXInput.value), parseFloat(translacionYInput.value)];
-			
-			let xy = translaciones([x, y], translacion);
-	
-			console.log(xy);
-			let shape;
-			if (currentShape === 'rectangle') {
-				shape = { type: 'rectangle', x: xy[0], y: xy[1], width: 100, height: 50 };
-			} else if (currentShape === 'circle') {
-				shape = { type: 'circle', x: xy[0], y: xy[1], radius: 50 };
-			}
-			shapes.push(shape);
-			drawShapes();
-		});
-	
-		// Función para dibujar todas las formas en el canvas
-		function drawShapes() {
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			shapes.forEach((shape, index) => {
-				ctx.beginPath();
-				if (shape.type === 'rectangle') {
-					ctx.rect(shape.x, shape.y, shape.width, shape.height);
-				} else if (shape.type === 'circle') {
-					ctx.arc(shape.x, shape.y, shape.radius, 0, Math.PI * 2);
-				}
-				ctx.stroke();
-				ctx.fillStyle = 'rgba(0, 100, 255, 0.3)';
-				ctx.fill();
-				ctx.strokeStyle = 'black';
-				ctx.stroke();
-			});
-		}
-	
-		// Manejar el botón de limpiar
-		clearButton.addEventListener('click', () => {
-			shapes = [];
-			drawShapes();
-		});
-	
-		// Funciones puras:
-	
-		// Translacion
-		function translaciones(ubicacion, desplazamiento) {
-			var actual = [];
-			for (let index = 0; index < ubicacion.length; index++) {
-				actual[index] = ubicacion[index] + desplazamiento[index];
-			}
-			return actual;
-		}
-	
-		// Rotacion
-		function rotacion(posicion, angulo) {
-			
-			const r = Math.sqrt(posicion[0] * posicion[0] + posicion[1] * posicion[1]);
-    		const theta = Math.atan2(posicion[1], posicion[0]) * (180 / Math.PI);
+        // Obtener referencias a los elementos
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const shapeSelect = document.getElementById('shape');
+        const clearButton = document.getElementById('clear');
+    
+        // Propiedades de las figuras
+        const translacionXInput = document.getElementById("translacionX");
+        const translacionYInput = document.getElementById("translacionY");
+        const rotacionInput = document.getElementById("rotacion");
+    
+        let currentShape = 'rectangle';
+        let shapes = [];
+        let selectedShapeIndex = null;
+    
+        // Manejar la selección de formas
+        shapeSelect.addEventListener('change', (e) => {
+            currentShape = e.target.value;
+        });
+    
+        // Manejar el clic en el canvas para dibujar formas
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+    
 
-			return[r,theta+angulo]
-		}
-	
-		// Escala
-		function escalarRectangulo(propiedades, porcentaje) {
-			var actual = [];
-			for (let index = 0; index < propiedades.length; index++) {
-				actual[index] = propiedades[index] * (porcentaje / 100);
-			}
-			return actual;
-		}
-	
-		function escalarCirculo(radio, porcentaje) {
-			return radio * (porcentaje / 100);
-		}
-	</script>
+            const translacionX = parseFloat(translacionXInput.value);
+            const translacionY = parseFloat(translacionYInput.value);
+            const angulo = parseFloat(rotacionInput.value);
+    
+            // Aplicar translación a las coordenadas
+            const translated = translaciones([x, y], [translacionX, translacionY]);
+    
+            console.log(translated);
+            let shape;
+            if (currentShape === 'rectangle') {
+                shape = { type: 'rectangle', x: translated[0], y: translated[1], width: 100, height: 50, angle: angulo };
+            } else if (currentShape === 'circle') {
+                shape = { type: 'circle', x: translated[0], y: translated[1], radius: 50 };
+            }
+            shapes.push(shape);
+            drawShapes();
+        });
+    
+        // Función para dibujar todas las formas en el canvas
+        function drawShapes() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            shapes.forEach((shape) => {
+                ctx.save();
+                ctx.beginPath();
+                if (shape.type === 'rectangle') {
+                    ctx.translate(shape.x + shape.width / 2, shape.y + shape.height / 2);
+
+					//metodo para rotar la figura sobre su propio eje
+                    ctx.rotate(shape.angle * Math.PI / 180);
+
+                    ctx.rect(-shape.width / 2, -shape.height / 2, shape.width, shape.height);
+                } else if (shape.type === 'circle') {
+                    ctx.arc(shape.x, shape.y, shape.radius, 0, Math.PI * 2);
+                }
+                ctx.fillStyle = 'rgba(0, 100, 255, 0.3)';
+                ctx.fill();
+                ctx.strokeStyle = 'black';
+                ctx.stroke();
+                ctx.restore();
+            });
+        }
+    
+        // Manejar el botón de limpiar
+        clearButton.addEventListener('click', () => {
+            shapes = [];
+            drawShapes();
+        });
+    
+        // Funciones puras:
+    
+        // Translacion
+        function translaciones(ubicacion, desplazamiento) {
+            return [ubicacion[0] + desplazamiento[0], ubicacion[1] + desplazamiento[1]];
+        }
+    
+        // Rotacion
+        function rotacion(posicion, angulo) {
+            const rad = angulo * Math.PI / 180;
+            const cos = Math.cos(rad);
+            const sin = Math.sin(rad);
+            const x = posicion[0];
+            const y = posicion[1];
+            return [
+                x * cos - y * sin,
+                x * sin + y * cos
+            ];
+        }
+    
+        // Escala
+        function escalarRectangulo(propiedades, porcentaje) {
+            var actual = [];
+            for (let index = 0; index < propiedades.length; index++) {
+                actual[index] = propiedades[index] * (porcentaje / 100);
+            }
+            return actual;
+        }
+    
+        function escalarCirculo(radio, porcentaje) {
+            return radio * (porcentaje / 100);
+        }
+    </script>
 	
 </body>
 </html>
